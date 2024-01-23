@@ -65,6 +65,24 @@ class URLSessionHTTPClientTests: XCTestCase {
         let receivedError = makeErrorResult(with: anyPOSTRequest, data: nil, response: nil, error: nil)
         XCTAssertEqual(receivedError, expectedError)
     }
+    
+    func test_request_succeedsOnGetHTTPURLResponseWithData() {
+        let data = anyData
+        let response = anyGETHttpURLResponse
+        let receivedValues = makeValueResult(with: anyGETRequest, data: data, response: response, error: nil)
+        XCTAssertEqual(receivedValues?.data, data)
+        XCTAssertEqual(receivedValues?.response.url, response.url)
+        XCTAssertEqual(receivedValues?.response.statusCode, response.statusCode)
+    }
+    
+    func test_request_succeedsOnPostHTTPURLResponseWithData() {
+        let data = anyData
+        let response = anyPOSTHttpURLResponse
+        let receivedValues = makeValueResult(with: anyPOSTRequest, data: data, response: response, error: nil)
+        XCTAssertEqual(receivedValues?.data, data)
+        XCTAssertEqual(receivedValues?.response.url, response.url)
+        XCTAssertEqual(receivedValues?.response.statusCode, response.statusCode)
+    }
 }
 
 // MARK: - Define
