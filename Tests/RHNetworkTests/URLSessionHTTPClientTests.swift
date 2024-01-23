@@ -34,6 +34,25 @@ class URLSessionHTTPClientTests: XCTestCase {
         let receivedError = makeErrorResult(with: anyPOSTRequest, data: nil, response: nil, error: requestedError)
         XCTAssertEqual(receivedError, expectedError)
     }
+    
+    func test_request_succeedsWithEmptyDataOnGetHTTPURLResponseWithNilData() {
+        let response = anyGETHttpURLResponse
+        let receivedValues = makeValueResult(with: anyGETRequest, data: nil, response: response, error: nil)
+        let emptyData = Data()
+        // if data is nil, URLProtocol will send a 0 byte data automatically
+        XCTAssertEqual(receivedValues?.data, emptyData)
+        XCTAssertEqual(receivedValues?.response.url, response.url)
+        XCTAssertEqual(receivedValues?.response.statusCode, response.statusCode)
+    }
+    
+    func test_request_succeedsWithEmptyDataOnPostHTTPURLResponseWithNilData() {
+        let response = anyPOSTHttpURLResponse
+        let receivedValues = makeValueResult(with: anyPOSTRequest, data: nil, response: response, error: nil)
+        let emptyData = Data()
+        XCTAssertEqual(receivedValues?.data, emptyData)
+        XCTAssertEqual(receivedValues?.response.url, response.url)
+        XCTAssertEqual(receivedValues?.response.statusCode, response.statusCode)
+    }
 }
 
 // MARK: - Define
