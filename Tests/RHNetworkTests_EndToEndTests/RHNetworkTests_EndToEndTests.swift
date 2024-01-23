@@ -8,7 +8,19 @@
 import XCTest
 @testable import RHNetwork
 
-final class RHNetworkAPITests_EndToEndTests: XCTestCase {}
+final class RHNetworkAPITests_EndToEndTests: XCTestCase {
+    func test_request_matchesPokemonPikachuData() {
+        if let receivedData = getPikachuData(),
+            let json = try? JSONSerialization.jsonObject(with: receivedData, options: []) as? [String: Any] {
+            guard let pokemon_species = json["pokemon_species"] as? [[String: Any]] else {
+                XCTFail("Expected pokemon_species, but got no pokemon_species!")
+                return
+            }
+            XCTAssertEqual(pokemon_species.count, 51)
+        }
+    }
+}
+
 private extension RHNetworkAPITests_EndToEndTests {
     struct RequestTypeSpy: RequestType {
         var headers: [String : String]? { nil }
