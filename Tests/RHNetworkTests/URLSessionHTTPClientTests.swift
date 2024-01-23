@@ -112,4 +112,17 @@ private extension URLSessionHTTPClientTests {
         trackForMemoryLeak(sut, file: file, line: line)
         return sut
     }
+    
+    func makeResult(with request: RequestType, data: Data?, response: URLResponse?, error: Error?, file: StaticString=#file, line: UInt=#line) -> HTTPClientResult {
+        URLProtocolStub.stub(data: data, response: response, error: error)
+        let sut = makeSUT(file: file, line: line)
+        let expect = expectation(description: "Wait for completion ...")
+        var receivedResult: HTTPClientResult!
+        sut.request(with: request) { result in
+            receivedResult = result
+            expect.fulfill()
+        }
+        wait(for: [expect], timeout: 1.0)
+        return receivedResult
+    }
 }
