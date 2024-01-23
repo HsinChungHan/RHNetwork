@@ -19,6 +19,21 @@ class URLSessionHTTPClientTests: XCTestCase {
         super.tearDown()
         URLProtocolStub.stopInterceptingRequests()
     }
+    
+    func test_request_failsOnGetRequestError() {
+        let requestedError = anyError
+        let expectedError = HTTPClientError.responseError
+        let receivedError = makeErrorResult(with: anyGETRequest, data: nil, response: nil, error: requestedError) as? NSError
+        XCTAssertEqual(receivedError?.domain, expectedError._domain)
+        XCTAssertEqual(receivedError?.code, expectedError._code)
+    }
+    
+    func test_request_failsOnPostRequestError() {
+        let requestedError = anyError
+        let expectedError = HTTPClientError.responseError
+        let receivedError = makeErrorResult(with: anyPOSTRequest, data: nil, response: nil, error: requestedError)
+        XCTAssertEqual(receivedError, expectedError)
+    }
 }
 
 // MARK: - Define
