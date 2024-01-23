@@ -17,4 +17,22 @@ private extension RHNetworkAPITests_EndToEndTests {
         var path: String { "pokemon-color/1" }
         var method: HTTPMethod { .get }
     }
+    
+    func getPikachuData(file: StaticString=#file, line: UInt=#line) -> Data? {
+        let request = RequestTypeSpy()
+        let client = URLSessionHTTPClient(session: URLSession(configuration: .ephemeral))
+        var receivedData: Data?
+        let exp = expectation(description: "wait for the response ...")
+        client.request(with: request) { result in
+            switch result {
+            case let .success(data, _):
+                receivedData = data
+            default:
+                XCTFail("Expected success, got \(result) instead", file: file, line: line)
+            }
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 30.0)
+        return receivedData
+    }
 }
