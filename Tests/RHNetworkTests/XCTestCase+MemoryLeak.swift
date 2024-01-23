@@ -5,6 +5,8 @@
 //  Created by Chung Han Hsin on 2024/1/23.
 //
 
+import XCTest
+
 extension XCTestCase {
     func trackForMemoryLeak(_ instance: AnyObject, file: StaticString=#file, line: UInt=#line) {
         addTeardownBlock { [weak instance] in
