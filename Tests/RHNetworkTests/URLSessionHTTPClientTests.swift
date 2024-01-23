@@ -86,4 +86,29 @@ private extension URLSessionHTTPClientTests {
         }
     }
 }
+
+// MARK: - factory methods
+private extension URLSessionHTTPClientTests {
+    var anyError: NSError {
+        .init(domain: "any error", code: 0, userInfo: nil)
+    }
+    
+    var anyData: Data { .init("any data".utf8) }
+    
+    var anyGETRequest: RequestSpy { .init(path: "testGet", method: .get, body: nil) }
+    var anyPOSTRequest: RequestSpy { .init(path: "testPost", method: .post, body: anyData) }
+    
+    var anyGETHttpURLResponse: HTTPURLResponse {
+        HTTPURLResponse(url: anyGETRequest.fullURL, statusCode: 200, httpVersion: nil, headerFields: nil)!
+    }
+    
+    var anyPOSTHttpURLResponse: HTTPURLResponse {
+        HTTPURLResponse(url: anyPOSTRequest.fullURL, statusCode: 200, httpVersion: nil, headerFields: nil)!
+    }
+    
+    func makeSUT(file: StaticString=#file, line: UInt=#line) -> HTTPClient {
+        let sut = URLSessionHTTPClient()
+        trackForMemoryLeak(sut, file: file, line: line)
+        return sut
+    }
 }
