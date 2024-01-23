@@ -72,4 +72,18 @@ private extension URLSessionHTTPClientTests {
         // It should be implemented, or the system will crash during runtime
         override func stopLoading() {}
     }
+    
+    struct RequestSpy: RequestType {
+        var baseURL: URL { URL.init(string: "https://any-url")! }
+        var headers: [String : String]? { nil }
+        var path: String
+        var method: HTTPMethod
+        var body: Data?
+        init(path: String, method: HTTPMethod, body: Data?) {
+            self.path = path
+            self.method = method
+            self.body = body
+        }
+    }
+}
 }
