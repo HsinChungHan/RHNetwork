@@ -125,4 +125,28 @@ private extension URLSessionHTTPClientTests {
         wait(for: [expect], timeout: 1.0)
         return receivedResult
     }
+    
+    func makeErrorResult(with request: RequestType, data: Data?, response: URLResponse?, error: Error?, file: StaticString=#file, line: UInt=#line) -> HTTPClientError? {
+        URLProtocolStub.stub(data: data, response: response, error: error)
+        let result = makeResult(with: request, data: data, response: response, error: error, file: file, line: line)
+        switch result {
+        case let .failure(error):
+            return error
+        default:
+            XCTFail("Expected failure, got \(result) instead", file: file, line: line)
+            return nil
+        }
+    }
+    
+    func makeValueResult(with request: RequestType, data: Data?, response: URLResponse?, error: Error?, file: StaticString=#file, line: UInt=#line) -> (data: Data, response: HTTPURLResponse)? {
+        URLProtocolStub.stub(data: data, response: response, error: error)
+        let result = makeResult(with: request, data: data, response: response, error: error, file: file, line: line)
+        switch result {
+        case let .success(data, response):
+            return (data, response)
+        default:
+            XCTFail("Expected failure, got \(result) instead", file: file, line: line)
+            return nil
+        }
+    }
 }
