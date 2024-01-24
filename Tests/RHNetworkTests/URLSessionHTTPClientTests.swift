@@ -23,9 +23,8 @@ class URLSessionHTTPClientTests: XCTestCase {
     func test_request_failsOnGetRequestError() {
         let requestedError = anyError
         let expectedError = HTTPClientError.responseError
-        let receivedError = makeErrorResult(with: anyGETRequest, data: nil, response: nil, error: requestedError) as? NSError
-        XCTAssertEqual(receivedError?.domain, expectedError._domain)
-        XCTAssertEqual(receivedError?.code, expectedError._code)
+        let receivedError = makeErrorResult(with: anyGETRequest, data: nil, response: nil, error: requestedError)
+        XCTAssertEqual(receivedError, expectedError)
     }
     
     func test_request_failsOnPostRequestError() {
@@ -92,7 +91,6 @@ private extension URLSessionHTTPClientTests {
         let response: URLResponse?
         let error: Error?
     }
-    
     
     class URLProtocolStub: URLProtocol {
         private static var stub: RequesAndResponeStub?

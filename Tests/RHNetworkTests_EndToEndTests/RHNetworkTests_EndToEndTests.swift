@@ -32,6 +32,7 @@ private extension RHNetworkAPITests_EndToEndTests {
     
     func getPikachuData(file: StaticString=#file, line: UInt=#line) -> Data? {
         let request = RequestTypeSpy()
+        // ephemeral: we don't need to cahce for session-related data
         let client = URLSessionHTTPClient(session: URLSession(configuration: .ephemeral))
         var receivedData: Data?
         let exp = expectation(description: "wait for the response ...")
