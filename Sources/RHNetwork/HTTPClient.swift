@@ -8,6 +8,7 @@
 import Foundation
 
 public enum HTTPClientError: Error {
+    case jsonToDataError
     case responseError
     case cannotFindDataOrResponse
 }
