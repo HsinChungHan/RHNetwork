@@ -146,6 +146,7 @@ private extension URLSessionHTTPClientTests {
     }
     
     struct RequestSpy: RequestType {
+        var queryItems: [URLQueryItem] = []
         var baseURL: URL { URL.init(string: "https://any-url")! }
         var headers: [String : String]? { nil }
         var path: String
@@ -167,8 +168,8 @@ private extension URLSessionHTTPClientTests {
     
     var anyData: Data { .init("any data".utf8) }
     
-    var anyGETRequest: RequestSpy { .init(path: "testGet", method: .get, body: nil) }
-    var anyPOSTRequest: RequestSpy { .init(path: "testPost", method: .post, body: anyData) }
+    var anyGETRequest: RequestSpy { .init(path: "/testGet", method: .get, body: nil) }
+    var anyPOSTRequest: RequestSpy { .init(path: "/testPost", method: .post, body: anyData) }
     
     var anyGETHttpURLResponse: HTTPURLResponse {
         HTTPURLResponse(url: anyGETRequest.fullURL, statusCode: 200, httpVersion: nil, headerFields: nil)!
