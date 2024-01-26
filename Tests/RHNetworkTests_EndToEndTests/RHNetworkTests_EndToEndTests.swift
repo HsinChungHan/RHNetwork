@@ -22,6 +22,23 @@ final class RHNetworkAPITests_EndToEndTests: XCTestCase {
             XCTAssertEqual(pokemon_species.count, 51)
         }
     }
+    
+    func test_request_matchesPokemonsData() {
+        if 
+            let receivedData = getPokemonsData(),
+            let json = try? JSONSerialization.jsonObject(with: receivedData, options: []) as? [String: Any] 
+        {
+            guard 
+                let counts = json["count"] as? Int,
+                let pokemons = json["results"] as? [[String: Any]]
+            else {
+                XCTFail("Expected results, but got no pokemon_species!")
+                return
+            }
+            XCTAssertEqual(counts, 1302)
+            XCTAssertEqual(pokemons.count, 1302)
+        }
+    }
 }
 
 private extension RHNetworkAPITests_EndToEndTests {
@@ -53,6 +70,19 @@ private extension RHNetworkAPITests_EndToEndTests {
         return receivedData
     }
     
+    struct PokemonsRequest: RequestType {
+        var queryItems: [URLQueryItem] = [
+            .init(name: "limit", value: "1302")
+        ]
+        var headers: [String : String]? { nil }
+        var body: Data? { nil }
+        var baseURL: URL { .init(string: "https://pokeapi.co/api/v2")! }
+        var path: String { "/pokemon" }
+        var method: HTTPMethod { .get }
+    }
+    
+    func getPokemonsData(file: StaticString=#file, line: UInt=#line) -> Data? {
+        let request = PokemonsRequest()
         // ephemeral: we don't need to cahce for session-related data
         let client = URLSessionHTTPClient(session: URLSession(configuration: .ephemeral))
         var receivedData: Data?
