@@ -15,6 +15,7 @@ public enum HTTPMethod: String {
 public protocol RequestType {
     var baseURL: URL { get }
     var path: String { get }
+    var queryItems: [URLQueryItem] { get set }
     var fullURL: URL { get }
     var method: HTTPMethod { get }
     var body: Data? { get }
@@ -24,7 +25,13 @@ public protocol RequestType {
 
 public extension RequestType {
     var fullURL: URL {
-        baseURL.appendingPathComponent(path)
+        var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false)
+        components?.path += path
+        components?.queryItems = queryItems
+        guard let url = components?.url else {
+            fatalError("Invalid URL components: \(String(describing: components))")
+        }
+        return url
     }
     
     var urlRequest: URLRequest {
