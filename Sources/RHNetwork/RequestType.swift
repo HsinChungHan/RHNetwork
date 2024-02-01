@@ -10,7 +10,6 @@ import Foundation
 public enum HTTPMethod: String {
     case get = "GET"
     case post = "POST"
-    case download = "DOWNLOAD"
 }
 
 public protocol RequestType {
@@ -39,7 +38,11 @@ public extension RequestType {
         var urlRequest = URLRequest(url: fullURL)
         urlRequest.httpMethod = method.rawValue
         urlRequest.httpBody = body
-        urlRequest.allHTTPHeaderFields = headers
+        if let headers = headers {
+            for (headerField, headerValue) in headers {
+                urlRequest.setValue(headerValue, forHTTPHeaderField: headerField)
+            }
+        }
         return urlRequest
     }
 }
