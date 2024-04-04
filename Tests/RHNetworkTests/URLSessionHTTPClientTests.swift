@@ -180,7 +180,7 @@ private extension URLSessionHTTPClientTests {
     }
     
     func makeSUT(file: StaticString=#file, line: UInt=#line) -> HTTPClient {
-        let sut = URLSessionHTTPClient()
+        let sut = URLSessionHTTPClient(session: .shared)
         trackForMemoryLeak(sut, file: file, line: line)
         return sut
     }

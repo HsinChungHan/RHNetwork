@@ -11,6 +11,7 @@ public enum HTTPClientError: Error {
     case jsonToDataError
     case responseError
     case cannotFindDataOrResponse
+    case HTTPMethodShouldBePOST
 }
 
 public enum HTTPClientResult {
@@ -20,4 +21,7 @@ public enum HTTPClientResult {
 
 public protocol HTTPClient {
     func request(with request: RequestType, completion: @escaping (HTTPClientResult) -> Void)
+    func uploadDataTaskWithProgress(with request: RequestType, from data: Data?, completion: @escaping (HTTPClientResult) -> Void)
+    var didUploadDataTaskWithProgress: ((_ totalBytesExpectedToSend: Int64 , _ progress: Float) -> Void)? { get set }
 }
+
