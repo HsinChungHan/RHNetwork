@@ -8,6 +8,7 @@
 import Foundation
 
 public class URLSessionHTTPClient: NSObject, HTTPClient {
+    
     public var progressUpdateDict: [String : ((Float) -> Void)] = [:]
         
     var session: URLSession!
@@ -40,7 +41,15 @@ public class URLSessionHTTPClient: NSObject, HTTPClient {
         }.resume()
     }
     
-    public func uploadDataTaskWithProgress(with request: RequestType, from data: Data?, taskID: String? = nil, completion: @escaping (HTTPClientResult) -> Void) {
+    public func uploadDataTaskWithProgress(with request: RequestType, from data: Data?, completion: @escaping (HTTPClientResult) -> Void, taskID: String? = nil,  withProgressAction action: ((Float) -> Void)? = nil) {
+        var progressUpdateDictID = request.fullURL.absoluteString
+        // 若 task.description 有 value，優先使用當作 progressUpdateDictID
+        if let taskID {
+            progressUpdateDictID = taskID
+        }
+        if let action {
+            registerProgressUpdate(for: progressUpdateDictID, with: action)
+        }
         
         if request.urlRequest.httpMethod != HTTPMethod.post.rawValue {
             completion(.failure(.HTTPMethodShouldBePOST))
