@@ -8,8 +8,8 @@
 import Foundation
 
 public class URLSessionHTTPClient: NSObject, HTTPClient {
-    public var didUploadDataTaskWithProgress: ((Int64, Float) -> Void)? = nil
-    
+    public var progressUpdateDict: [String : ((Float) -> Void)] = [:]
+        
     var session: URLSession!
     private let uploadDataTaskWithProgress: UploadDataTaskWithProgress?
     public init(uploadDataTaskWithProgress: UploadDataTaskWithProgress) {
@@ -66,15 +66,20 @@ public class URLSessionHTTPClient: NSObject, HTTPClient {
             completion(.success(data, response))
         }.resume()
     }
+    
+    public func registerProgressUpdate(for url: String, with action: @escaping (Float) -> Void) {
+        progressUpdateDict[url] = action
+    }
 }
 
 extension URLSessionHTTPClient: URLSessionTaskDelegate {
     public func urlSession(_ session: URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
-        
+        guard let url = task.currentRequest?.url?.absoluteString else { return }
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             self.uploadDataTaskWithProgress?.uploadDataTaskWithProgress(didSendBodyData: bytesSent, totalBytesSent: totalBytesSent, totalBytesExpectedToSend: totalBytesExpectedToSend) { progress in
-                self.didUploadDataTaskWithProgress?(totalBytesSent, progress)
+                guard let progressUpdateClosure = self.progressUpdateDict[url] else { return }
+                progressUpdateClosure(progress)
             }
         }
     }
