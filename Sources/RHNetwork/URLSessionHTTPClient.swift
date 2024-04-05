@@ -40,7 +40,8 @@ public class URLSessionHTTPClient: NSObject, HTTPClient {
         }.resume()
     }
     
-    public func uploadDataTaskWithProgress(with request: RequestType, from data: Data?, completion: @escaping (HTTPClientResult) -> Void) {
+    public func uploadDataTaskWithProgress(with request: RequestType, from data: Data?, taskID: String? = nil, completion: @escaping (HTTPClientResult) -> Void) {
+        
         if request.urlRequest.httpMethod != HTTPMethod.post.rawValue {
             completion(.failure(.HTTPMethodShouldBePOST))
             return
@@ -51,7 +52,7 @@ public class URLSessionHTTPClient: NSObject, HTTPClient {
 
          因此在 RequestType 協議擴展中設置 urlRequest.httpBody = body 是對於普通的資料請求（如 dataTask）來說是沒有問題的，因為這些請求類型通常需要在請求體中攜帶數據。然而，當進行檔案上傳操作時，這樣做就不適合了。
          */
-        session.uploadTask(with: request.urlRequest, from: data) { data, response, error in
+        let task = session.uploadTask(with: request.urlRequest, from: data) { data, response, error in
             if let _ = error {
                 completion(.failure(.responseError))
                 return
@@ -64,21 +65,31 @@ public class URLSessionHTTPClient: NSObject, HTTPClient {
                 return
             }
             completion(.success(data, response))
-        }.resume()
+        }
+        // 若 user 輸入 taskID，則存入
+        task.taskDescription = taskID
+        task.resume()
     }
     
-    public func registerProgressUpdate(for url: String, with action: @escaping (Float) -> Void) {
-        progressUpdateDict[url] = action
+    public func registerProgressUpdate(for taskID: String, with action: @escaping (Float) -> Void) {
+        progressUpdateDict[taskID] = action
     }
 }
 
 extension URLSessionHTTPClient: URLSessionTaskDelegate {
     public func urlSession(_ session: URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
+        
         guard let url = task.currentRequest?.url?.absoluteString else { return }
+        var progressUpdateDictID = url
+        // 若 task.description 有 value，優先使用當作 progressUpdateDictID
+        if let taskID = task.taskDescription {
+            progressUpdateDictID = taskID
+        }
+        
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             self.uploadDataTaskWithProgress?.uploadDataTaskWithProgress(didSendBodyData: bytesSent, totalBytesSent: totalBytesSent, totalBytesExpectedToSend: totalBytesExpectedToSend) { progress in
-                guard let progressUpdateClosure = self.progressUpdateDict[url] else { return }
+                guard let progressUpdateClosure = self.progressUpdateDict[progressUpdateDictID] else { return }
                 progressUpdateClosure(progress)
             }
         }
