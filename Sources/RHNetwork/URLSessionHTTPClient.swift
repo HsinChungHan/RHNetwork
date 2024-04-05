@@ -12,15 +12,15 @@ public class URLSessionHTTPClient: NSObject, HTTPClient {
         
     var session: URLSession!
     private let uploadDataTaskWithProgress: UploadDataTaskWithProgress?
-    public init(uploadDataTaskWithProgress: UploadDataTaskWithProgress) {
+    public init(configuration: URLSessionConfiguration, uploadDataTaskWithProgress: UploadDataTaskWithProgress) {
         self.uploadDataTaskWithProgress = uploadDataTaskWithProgress
         super.init()
-        self.session = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
+        self.session = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
     }
     
-    public init(session: URLSession, uploadDataTaskWithProgress: UploadDataTaskWithProgress? = nil) {
+    public init(session: URLSession) {
         self.session = session
-        self.uploadDataTaskWithProgress = uploadDataTaskWithProgress
+        self.uploadDataTaskWithProgress = nil
     }
     
     public func request(with request: RequestType, completion: @escaping (HTTPClientResult) -> Void) {
