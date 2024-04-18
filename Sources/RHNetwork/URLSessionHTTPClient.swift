@@ -16,6 +16,8 @@ public class URLSessionHTTPClient: NSObject, HTTPClient {
     public init(configuration: URLSessionConfiguration, uploadDataTaskWithProgress: UploadDataTaskWithProgress) {
         self.uploadDataTaskWithProgress = uploadDataTaskWithProgress
         super.init()
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData // 忽略本地緩存
+        configuration.urlCache = nil // 顯式禁用 URLSession 的緩存
         self.session = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
     }
     
